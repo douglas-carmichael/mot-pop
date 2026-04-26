@@ -104,10 +104,6 @@ The slot classifier in `LocalizedContent.SlotClassifier` reads each sentence's w
 
 The original web version was a Discord-authenticated Node.js + WebSocket party game in French. This macOS port re-implements the same core mechanic natively in SwiftUI with Network.framework and Bonjour, adds an English localization, and replaces Discord OAuth with local-network discovery.
 
-## License
-
-License terms are pending — the original web project does not carry a license file, so terms are being worked out with the original authors. Until that is resolved, this code is shared as-is and should not be redistributed or used in derivative works without first contacting the credited authors.
-
 ---
 
 <a id="français"></a>
@@ -190,6 +186,3 @@ Le classificateur de slots dans `LocalizedContent.SlotClassifier` lit les mots a
 
 La version web originale était un jeu d'ambiance francophone en Node.js + WebSocket avec authentification Discord. Ce portage macOS réimplémente la même mécanique en SwiftUI natif avec Network.framework et Bonjour, ajoute une localisation anglaise, et remplace l'authentification Discord par une découverte sur le réseau local.
 
-## Licence
-
-La licence reste à définir — le projet web original ne dispose pas d'un fichier de licence, et les conditions sont en cours de discussion avec les auteurs originaux. En attendant, ce code est partagé en l'état et ne doit pas être redistribué ou utilisé dans une œuvre dérivée sans contacter au préalable les auteurs crédités.
