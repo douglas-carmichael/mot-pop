@@ -1,0 +1,107 @@
+/* App */
+"app.title" = "Mot Pop";
+"app.tagline" = "Complétez la phrase — ensemble.";
+
+/* Menu */
+"menu.solo.title" = "Solo";
+"menu.solo.subtitle" = "Affrontez des bots futés hors ligne.";
+"menu.host.title" = "Héberger une partie";
+"menu.host.subtitle" = "Ouvrez un salon sur votre réseau local.";
+"menu.join.title" = "Rejoindre une partie";
+"menu.join.subtitle" = "Trouvez des hôtes à proximité via Bonjour.";
+"menu.name.label" = "VOTRE NOM";
+"menu.name.placeholder" = "Entrez un nom";
+"menu.howToPlay" = "Comment jouer";
+
+/* Comment jouer */
+"howto.title" = "Comment jouer";
+"howto.intro" = "Mot Pop est un jeu d'ambiance rapide et décalé. À chaque tour, une phrase apparaît avec un mot manquant — complétez-la, puis tout le monde révèle ses réponses en même temps.";
+"howto.stepNumber" = "Étape %d";
+"howto.step1.title" = "Choisissez un mode";
+"howto.step1.body" = "Affrontez des bots IA en solo, hébergez une partie sur votre réseau local, ou rejoignez la partie d'un joueur à proximité.";
+"howto.step2.title" = "Complétez la phrase";
+"howto.step2.body" = "À chaque tour, une phrase contient un trou, noté §. Tapez ce que vous voulez — drôle, malin, absurde, tout est permis.";
+"howto.step3.title" = "Battez le chrono";
+"howto.step3.body" = "Vous avez quelques secondes pour répondre. Appuyez sur Entrée ou cliquez sur Envoyer. Sinon, votre réponse reste vide pour ce tour.";
+"howto.step4.title" = "Comparez et riez";
+"howto.step4.body" = "Toutes les réponses s'insèrent dans la même phrase. L'hôte fait défiler les tours, puis affiche le récapitulatif final.";
+"howto.example.before" = "Si j'avais un super-pouvoir, ce serait de ";
+"howto.example.fill" = "faire disparaître les goûters";
+"howto.example.after" = ".";
+"howto.tips.title" = "Astuces";
+"howto.tip1" = "L'hôte et les joueurs doivent simplement être sur le même réseau — Bonjour découvre la partie tout seul.";
+"howto.tip2" = "Les réponses courtes sont souvent plus drôles que les longues.";
+"howto.tip3" = "Appuyez sur ⌘? à tout moment pour rouvrir cet écran.";
+"howto.credits.title" = "Crédits";
+"howto.credits.originalRole" = "Création originale";
+"howto.credits.portRole" = "Portage macOS";
+
+/* Lobby */
+"lobby.solo.title" = "Réglages solo";
+"lobby.solo.subtitle" = "Ajustez la partie avant de commencer.";
+"lobby.host.title" = "Salon";
+"lobby.host.subtitle" = "Configurez la partie et attendez les joueurs.";
+"lobby.host.broadcast" = "Diffusion sur le réseau local";
+"lobby.host.serviceName" = "Service Bonjour";
+"lobby.host.waitingForPlayers" = "En attente de joueurs…";
+"lobby.client.title" = "Connecté";
+"lobby.client.subtitle" = "L'hôte lancera la partie quand il sera prêt.";
+"lobby.client.connected" = "Connecté — en attente du lancement";
+"lobby.browse.title" = "Rejoindre une partie";
+"lobby.browse.subtitle" = "Recherche d'hôtes à proximité.";
+"lobby.browse.searching" = "Recherche d'hôtes sur votre réseau…";
+"lobby.browse.foundHosts" = "Hôtes disponibles";
+"lobby.browse.empty" = "Aucun hôte trouvé pour le moment.\nVérifiez qu'un autre Mac héberge bien sur le même réseau.";
+"lobby.browse.tapToJoin" = "Cliquez pour rejoindre";
+
+"lobby.config.title" = "Paramètres de la partie";
+"lobby.config.rounds" = "Tours";
+"lobby.config.opponents" = "Adversaires IA";
+"lobby.config.timePerRound" = "Temps par tour";
+"lobby.config.maxPlayers" = "Joueurs max";
+
+"lobby.players.title" = "Joueurs";
+"lobby.players.connected" = "Joueurs";
+
+/* Countdown */
+"countdown.starting" = "Préparez-vous !";
+
+/* Game */
+"game.round.label" = "TOUR";
+"game.completeTheSentence" = "Complétez la phrase";
+"game.answer.placeholder" = "Votre réponse…";
+"game.waiting.others" = "En attente des autres joueurs…";
+"game.status.waitingOthers" = "En attente des autres…";
+"game.status.yourTurn" = "Tapez votre réponse";
+
+/* Results */
+"results.round.title" = "TOUR";
+"results.round.results" = "Résultats du tour";
+"results.waitingHost" = "En attente de l'hôte…";
+"results.nextRound" = "Tour suivant";
+"results.seeFinal" = "Voir les résultats finaux";
+"results.final.title" = "C'est terminé !";
+"results.final.subtitle" = "Récapitulatif de chaque tour.";
+"results.round.format" = "Tour %d";
+
+/* Actions */
+"action.back" = "Retour";
+"action.start" = "Lancer la partie";
+"action.submit" = "Envoyer";
+"action.leave" = "Quitter";
+"action.kick" = "Exclure le joueur";
+"action.backToMenu" = "Retour au menu";
+
+/* Format */
+"format.seconds" = "%.0fs";
+
+/* Errors */
+"error.lobbyFull" = "Le salon est complet.";
+"error.disconnected" = "Déconnecté de l'hôte.";
+"error.kicked" = "Vous avez été exclu par l'hôte.";
+
+/* Misc */
+"player.guest" = "Invité";
+"answer.empty.placeholder" = "(pas de réponse)";
+"answer.timeout.placeholder" = "(temps écoulé)";
+"host.service.name" = "Mot Pop de %@";

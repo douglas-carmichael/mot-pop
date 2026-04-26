@@ -1,0 +1,107 @@
+/* App */
+"app.title" = "Mot Pop";
+"app.tagline" = "Complete the sentence — together.";
+
+/* Menu */
+"menu.solo.title" = "Single player";
+"menu.solo.subtitle" = "Play against witty bots offline.";
+"menu.host.title" = "Host a game";
+"menu.host.subtitle" = "Open a lobby on your local network.";
+"menu.join.title" = "Join a game";
+"menu.join.subtitle" = "Find hosts nearby with Bonjour.";
+"menu.name.label" = "YOUR NAME";
+"menu.name.placeholder" = "Enter a name";
+"menu.howToPlay" = "How to play";
+
+/* How to play */
+"howto.title" = "How to play";
+"howto.intro" = "Mot Pop is a fast, silly party game. Each round shows a sentence with a missing word — fill the blank, then everyone reveals their answers together.";
+"howto.stepNumber" = "Step %d";
+"howto.step1.title" = "Pick a mode";
+"howto.step1.body" = "Play solo against witty AI bots, host a game on your local network, or join a game someone nearby is hosting.";
+"howto.step2.title" = "Complete the sentence";
+"howto.step2.body" = "Each round shows a sentence with one blank, marked §. Type whatever fits — funny, clever, weird, anything goes.";
+"howto.step3.title" = "Beat the timer";
+"howto.step3.body" = "You have a few seconds to submit. Hit Enter or click Submit. If you don't, your answer is empty for the round.";
+"howto.step4.title" = "Compare and laugh";
+"howto.step4.body" = "Every player's answer slots into the same sentence. The host advances through each round, then the final recap.";
+"howto.example.before" = "If I had a superpower, it would be ";
+"howto.example.fill" = "to vanish snacks";
+"howto.example.after" = ".";
+"howto.tips.title" = "Tips";
+"howto.tip1" = "Hosts and clients only need to be on the same network — Bonjour finds the game automatically.";
+"howto.tip2" = "Short answers usually land funnier than long ones.";
+"howto.tip3" = "Press ⌘? at any time to reopen this screen.";
+"howto.credits.title" = "Credits";
+"howto.credits.originalRole" = "Originally created by";
+"howto.credits.portRole" = "macOS port by";
+
+/* Lobby */
+"lobby.solo.title" = "Solo setup";
+"lobby.solo.subtitle" = "Tune the round before you jump in.";
+"lobby.host.title" = "Lobby";
+"lobby.host.subtitle" = "Configure the game and wait for players.";
+"lobby.host.broadcast" = "Broadcasting on local network";
+"lobby.host.serviceName" = "Bonjour service";
+"lobby.host.waitingForPlayers" = "Waiting for players to join…";
+"lobby.client.title" = "Connected";
+"lobby.client.subtitle" = "The host will start the game when ready.";
+"lobby.client.connected" = "Connected — waiting for the host to start";
+"lobby.browse.title" = "Find a game";
+"lobby.browse.subtitle" = "Looking for nearby hosts.";
+"lobby.browse.searching" = "Looking for hosts on your network…";
+"lobby.browse.foundHosts" = "Available hosts";
+"lobby.browse.empty" = "No hosts found yet.\nMake sure another Mac is hosting on the same network.";
+"lobby.browse.tapToJoin" = "Click to join";
+
+"lobby.config.title" = "Game settings";
+"lobby.config.rounds" = "Rounds";
+"lobby.config.opponents" = "AI opponents";
+"lobby.config.timePerRound" = "Time per round";
+"lobby.config.maxPlayers" = "Max players";
+
+"lobby.players.title" = "Players";
+"lobby.players.connected" = "Players";
+
+/* Countdown */
+"countdown.starting" = "Get ready!";
+
+/* Game */
+"game.round.label" = "ROUND";
+"game.completeTheSentence" = "Complete the sentence";
+"game.answer.placeholder" = "Your answer…";
+"game.waiting.others" = "Waiting for other players…";
+"game.status.waitingOthers" = "Waiting for others…";
+"game.status.yourTurn" = "Type your answer";
+
+/* Results */
+"results.round.title" = "ROUND";
+"results.round.results" = "Round results";
+"results.waitingHost" = "Waiting for the host…";
+"results.nextRound" = "Next round";
+"results.seeFinal" = "See final results";
+"results.final.title" = "That's a wrap!";
+"results.final.subtitle" = "Recap of every round.";
+"results.round.format" = "Round %d";
+
+/* Actions */
+"action.back" = "Back";
+"action.start" = "Start game";
+"action.submit" = "Submit";
+"action.leave" = "Leave";
+"action.kick" = "Kick player";
+"action.backToMenu" = "Back to menu";
+
+/* Format */
+"format.seconds" = "%.0fs";
+
+/* Errors */
+"error.lobbyFull" = "The lobby is full.";
+"error.disconnected" = "Disconnected from host.";
+"error.kicked" = "You were removed by the host.";
+
+/* Misc */
+"player.guest" = "Guest";
+"answer.empty.placeholder" = "(no answer)";
+"answer.timeout.placeholder" = "(timeout)";
+"host.service.name" = "%@'s Mot Pop";
