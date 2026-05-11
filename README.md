@@ -1,6 +1,6 @@
 # Mot Pop
 
-> A native macOS party word-completion game. Fill the blank, share the laugh.
+> A native macOS/tvOS party word-completion game. Fill the blank, share the laugh.
 > Solo against AI bots, or multiplayer over the local network with zero setup.
 
 🇬🇧 **English** · [🇫🇷 Lire en français](#français)
@@ -14,7 +14,7 @@
 
 ## Overview
 
-Mot Pop is a native SwiftUI macOS port of an original French web party game. Each round shows a sentence with one missing word — fill the blank, then everyone reveals their answers together. The blanks live in a shared sentence pool of around 260 prompts; the comedy comes from comparing fills.
+Mot Pop is a native SwiftUI macOS/tvOS port of an original French web party game. Each round shows a sentence with one missing word — fill the blank, then everyone reveals their answers together. The blanks live in a shared sentence pool of around 260 prompts; the comedy comes from comparing fills.
 
 Two modes:
 
@@ -100,7 +100,7 @@ The slot classifier in `LocalizedContent.SlotClassifier` reads each sentence's w
 |---|---|---|
 | Originally created by | **Amaury Crocquefer** | <amaury@crocque.fr> · [github.com/lapatatedouce59/wordGame](https://github.com/lapatatedouce59/wordGame) |
 | Originally created by | **Amélie** | <amelie@pmdapp.fr> · [github.com/AisakaPMD](https://github.com/AisakaPMD) |
-| macOS port | **Douglas Carmichael** | <dcarmich@dcarmichael.net> |
+| macOS/tvOS ports | **Douglas Carmichael** | <dcarmich@dcarmichael.net> |
 
 The original web version was a Discord-authenticated Node.js + WebSocket party game in French. This macOS port re-implements the same core mechanic natively in SwiftUI with Network.framework and Bonjour, adds an English localization, and replaces Discord OAuth with local-network discovery.
 
@@ -116,7 +116,7 @@ The original web version was a Discord-authenticated Node.js + WebSocket party g
 
 ## Présentation
 
-Mot Pop est un portage macOS natif en SwiftUI d'un jeu d'ambiance web français. À chaque tour, une phrase apparaît avec un mot manquant — complétez-la, puis tout le monde révèle ses réponses en même temps. Les phrases viennent d'une banque d'environ 260 prompts ; tout l'humour est dans la comparaison des réponses.
+Mot Pop est un portage macOS et tvOS natif en SwiftUI d'un jeu d'ambiance web français. À chaque tour, une phrase apparaît avec un mot manquant — complétez-la, puis tout le monde révèle ses réponses en même temps. Les phrases viennent d'une banque d'environ 260 prompts ; tout l'humour est dans la comparaison des réponses.
 
 Deux modes :
 
@@ -182,7 +182,7 @@ Le classificateur de slots dans `LocalizedContent.SlotClassifier` lit les mots a
 |---|---|---|
 | Création originale | **Amaury Crocquefer** | <amaury@crocque.fr> · [github.com/lapatatedouce59/wordGame](https://github.com/lapatatedouce59/wordGame) |
 | Création originale | **Amélie** | <amelie@pmdapp.fr> · [github.com/AisakaPMD](https://github.com/AisakaPMD) |
-| Portage macOS | **Douglas Carmichael** | <dcarmich@dcarmichael.net> |
+| Portage macOS/tvOS | **Douglas Carmichael** | <dcarmich@dcarmichael.net> |
 
 La version web originale était un jeu d'ambiance francophone en Node.js + WebSocket avec authentification Discord. Ce portage macOS réimplémente la même mécanique en SwiftUI natif avec Network.framework et Bonjour, ajoute une localisation anglaise, et remplace l'authentification Discord par une découverte sur le réseau local.
 
