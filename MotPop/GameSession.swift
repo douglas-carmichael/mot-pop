@@ -120,15 +120,36 @@ final class GameSession: ObservableObject {
 
     static func defaultPlayerName() -> String {
         #if os(macOS)
+        let full = NSFullUserName()
+        if !full.isEmpty {
+            let first = full.components(separatedBy: " ").first ?? full
+            return String(first.prefix(20))
+        }
         let host = Host.current().localizedName ?? NSUserName()
         let trimmed = host.replacingOccurrences(of: "'s Mac", with: "")
                           .replacingOccurrences(of: " Mac", with: "")
         return String(trimmed.prefix(20))
+        #elseif os(tvOS)
+        let deviceName = UIDevice.current.name
+        let bareNames = ["Apple TV", "Apple\u{00A0}TV"]
+        if bareNames.contains(deviceName) {
+            return NSLocalizedString("player.guest", value: "Guest", comment: "")
+        }
+        let suffixes = ["'s Apple TV", "'s Apple\u{00A0}TV",
+                        "\u{2019}s Apple TV", "\u{2019}s Apple\u{00A0}TV",
+                        " Apple TV", " Apple\u{00A0}TV"]
+        for suffix in suffixes {
+            if deviceName.hasSuffix(suffix) {
+                let name = String(deviceName.dropLast(suffix.count))
+                if !name.isEmpty { return String(name.prefix(20)) }
+            }
+        }
+        return NSLocalizedString("player.guest", value: "Guest", comment: "")
         #else
         let name = ProcessInfo.processInfo.hostName
             .replacingOccurrences(of: ".local", with: "")
             .replacingOccurrences(of: "-", with: " ")
-        if name.isEmpty { return NSLocalizedString("misc.guest", value: "Guest", comment: "") }
+        if name.isEmpty { return NSLocalizedString("player.guest", value: "Guest", comment: "") }
         return String(name.prefix(20))
         #endif
     }

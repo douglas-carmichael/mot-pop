@@ -1,4 +1,87 @@
 import SwiftUI
+#if os(tvOS)
+import UIKit
+#endif
+
+#if os(tvOS)
+private struct SilentFocusContainer<Content: View>: UIViewControllerRepresentable {
+    let content: Content
+
+    init(@ViewBuilder content: () -> Content) {
+        self.content = content()
+    }
+
+    func makeUIViewController(context: Context) -> SilentHostingController<Content> {
+        let controller = SilentHostingController(rootView: content)
+        controller.view.backgroundColor = .clear
+        controller.sizingOptions = .intrinsicContentSize
+        return controller
+    }
+
+    func updateUIViewController(_ controller: SilentHostingController<Content>, context: Context) {
+        controller.rootView = content
+    }
+}
+
+private class SilentHostingController<Content: View>: UIHostingController<Content> {
+    override func soundIdentifierForFocusUpdate(in context: UIFocusUpdateContext) -> UIFocusSoundIdentifier? {
+        UIFocusSoundIdentifier.none
+    }
+}
+
+private struct TVCloseButton: View {
+    var action: () -> Void
+    @FocusState private var focused: Bool
+    @State private var haloPulse = false
+
+    var body: some View {
+        Button(action: action) {
+            HStack(spacing: 8) {
+                Image(systemName: "xmark.circle.fill")
+                    .font(.system(size: 20, weight: .bold))
+                Text("action.close")
+                    .font(.system(.headline, design: .rounded).weight(.semibold))
+            }
+            .foregroundStyle(focused ? Color.black : Color.wgMuted)
+            .padding(.horizontal, 16)
+            .padding(.vertical, 10)
+            .background(
+                Capsule().fill(
+                    focused
+                        ? Color.wgAccent
+                        : Color.white.opacity(0.08)
+                )
+            )
+            .overlay(
+                Capsule().stroke(
+                    Color.wgAccent.opacity(focused ? 0 : 0.45),
+                    lineWidth: 1.2
+                )
+            )
+            .shadow(color: Color.wgAccent.opacity(focused ? 0.7 : 0.18),
+                    radius: focused ? (haloPulse ? 26 : 16) : 8,
+                    y: focused ? 0 : 4)
+            .shadow(color: Color.wgAccent.opacity(focused ? (haloPulse ? 0.55 : 0.3) : 0),
+                    radius: focused ? (haloPulse ? 48 : 32) : 0)
+        }
+        .buttonStyle(NoChromeTVButtonStyle())
+        .focused($focused)
+        .focusEffectDisabled()
+        .animation(.spring(response: 0.32, dampingFraction: 0.78), value: focused)
+        .onChange(of: focused) { _, isFocused in
+            if isFocused {
+                withAnimation(.easeInOut(duration: 1.2).repeatForever(autoreverses: true)) {
+                    haloPulse = true
+                }
+            } else {
+                withAnimation(.easeOut(duration: 0.3)) {
+                    haloPulse = false
+                }
+            }
+        }
+    }
+}
+#endif
 
 struct HowToPlayView: View {
     @Binding var isPresented: Bool
@@ -14,42 +97,62 @@ struct HowToPlayView: View {
 
     #if os(tvOS)
     private var tvBody: some View {
-        ZStack {
-            Color.wgBackground.ignoresSafeArea()
+        SilentFocusContainer {
+            ZStack {
+                Color.wgBackground.ignoresSafeArea()
 
-            VStack(spacing: 0) {
-                header
-                ScrollView {
-                    VStack(alignment: .leading, spacing: 18) {
-                        IntroBlurb().focusable()
-                        StepRow(number: 1,
-                                systemImage: "rectangle.stack.fill",
-                                accent: .wgPrimary,
-                                title: "howto.step1.title",
-                                detail: "howto.step1.body").focusable()
-                        StepRow(number: 2,
-                                systemImage: "text.bubble.fill",
-                                accent: .wgAccent,
-                                title: "howto.step2.title",
-                                detail: "howto.step2.body").focusable()
-                        ExampleSentence().focusable()
-                        StepRow(number: 3,
-                                systemImage: "timer",
-                                accent: .wgWaiting,
-                                title: "howto.step3.title",
-                                detail: "howto.step3.body").focusable()
-                        StepRow(number: 4,
-                                systemImage: "rectangle.grid.2x2.fill",
-                                accent: .wgGood,
-                                title: "howto.step4.title",
-                                detail: "howto.step4.body").focusable()
-                        TipsBlock().focusable()
-                        CreditsBlock().focusable()
+                VStack(spacing: 0) {
+                    HStack(alignment: .center) {
+                        HStack(spacing: 12) {
+                            Image(systemName: "questionmark.bubble.fill")
+                                .font(.system(size: 28, weight: .bold))
+                                .foregroundStyle(
+                                    LinearGradient(colors: [.wgPrimary, .wgAccent],
+                                                   startPoint: .topLeading, endPoint: .bottomTrailing)
+                                )
+                            Text("howto.title")
+                                .font(.system(size: 28, weight: .heavy, design: .rounded))
+                                .foregroundStyle(.white)
+                        }
+                        Spacer()
+                        TVCloseButton { isPresented = false }
                     }
-                    .padding(28)
+                    .padding(.horizontal, 28)
+                    .padding(.top, 24)
+                    .padding(.bottom, 8)
+
+                    ScrollView {
+                        VStack(alignment: .leading, spacing: 18) {
+                            IntroBlurb().focusable().focusEffectDisabled()
+                            StepRow(number: 1,
+                                    systemImage: "rectangle.stack.fill",
+                                    accent: .wgPrimary,
+                                    title: "howto.step1.title",
+                                    detail: "howto.step1.body").focusable().focusEffectDisabled()
+                            StepRow(number: 2,
+                                    systemImage: "text.bubble.fill",
+                                    accent: .wgAccent,
+                                    title: "howto.step2.title",
+                                    detail: "howto.step2.body").focusable().focusEffectDisabled()
+                            ExampleSentence().focusable().focusEffectDisabled()
+                            StepRow(number: 3,
+                                    systemImage: "timer",
+                                    accent: .wgWaiting,
+                                    title: "howto.step3.title",
+                                    detail: "howto.step3.body").focusable().focusEffectDisabled()
+                            StepRow(number: 4,
+                                    systemImage: "rectangle.grid.2x2.fill",
+                                    accent: .wgGood,
+                                    title: "howto.step4.title",
+                                    detail: "howto.step4.body").focusable().focusEffectDisabled()
+                            TipsBlock().focusable().focusEffectDisabled()
+                            CreditsBlock().focusable().focusEffectDisabled()
+                        }
+                        .padding(28)
+                    }
                 }
+                .frame(maxWidth: 720)
             }
-            .frame(maxWidth: 720)
         }
     }
     #endif
@@ -136,29 +239,13 @@ struct HowToPlayView: View {
                     .foregroundStyle(.white)
             }
             Spacer()
-            #if os(tvOS)
-            Button(action: close) {
-                HStack(spacing: 8) {
-                    Image(systemName: "xmark.circle.fill")
-                        .font(.system(size: 20, weight: .bold))
-                    Text("action.close")
-                        .font(.system(.headline, design: .rounded).weight(.semibold))
-                }
-                .foregroundStyle(Color.wgMuted)
-                .padding(.horizontal, 16)
-                .padding(.vertical, 10)
-                .background(Capsule().fill(Color.white.opacity(0.08)))
-                .overlay(Capsule().stroke(Color.white.opacity(0.14), lineWidth: 1))
-                .hoverEffect(.lift)
-            }
-            .buttonStyle(.plain)
-            #else
             Button(action: close) {
                 Image(systemName: "xmark.circle.fill")
                     .font(.system(size: 26))
                     .foregroundStyle(Color.wgMuted)
             }
             .buttonStyle(.plain)
+            #if os(macOS)
             .keyboardShortcut(.cancelAction)
             #endif
         }
@@ -369,17 +456,20 @@ private struct CreditEntry: View {
                 .textCase(.uppercase)
                 .tracking(1.5)
             ForEach(people, id: \.name) { person in
+                #if os(tvOS)
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(person.name)
+                        .font(.system(.body, design: .rounded).weight(.semibold))
+                        .foregroundStyle(.white)
+                    Text(person.email)
+                        .font(.system(.caption, design: .monospaced))
+                        .foregroundStyle(Color.wgAccent)
+                }
+                #else
                 HStack(spacing: 6) {
                     Text(person.name)
                         .font(.system(.body, design: .rounded).weight(.semibold))
                         .foregroundStyle(.white)
-                    #if os(tvOS)
-                    Text("·")
-                        .foregroundStyle(Color.wgMuted)
-                    Text(person.email)
-                        .font(.system(.caption, design: .monospaced))
-                        .foregroundStyle(Color.wgAccent)
-                    #else
                     Text("·")
                         .foregroundStyle(Color.wgMuted)
                     if let url = URL(string: "mailto:\(person.email)") {
@@ -387,8 +477,6 @@ private struct CreditEntry: View {
                             .font(.system(.caption, design: .monospaced))
                             .foregroundStyle(Color.wgAccent)
                     }
-                    #endif
-                    #if !os(tvOS)
                     if let linkString = person.link,
                        let url = URL(string: linkString) {
                         Text("·")
@@ -403,8 +491,8 @@ private struct CreditEntry: View {
                             .foregroundStyle(Color.wgAccent)
                         }
                     }
-                    #endif
                 }
+                #endif
             }
         }
     }

@@ -1,5 +1,14 @@
 import SwiftUI
 
+#if os(tvOS)
+struct NoChromeTVButtonStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .opacity(configuration.isPressed ? 0.7 : 1.0)
+    }
+}
+#endif
+
 struct MenuView: View {
     @EnvironmentObject var session: GameSession
 
@@ -121,6 +130,7 @@ private struct MutePill: View {
     @State private var hover = false
     #elseif os(tvOS)
     @FocusState private var focused: Bool
+    @State private var haloPulse = false
     #endif
 
     private var highlighted: Bool {
@@ -151,21 +161,37 @@ private struct MutePill: View {
                 )
                 .overlay(
                     Capsule().stroke(
-                        highlighted ? Color.wgAccent : Color.wgAccent.opacity(0.45),
+                        Color.wgAccent.opacity(highlighted ? 0 : 0.45),
                         lineWidth: 1.2
                     )
                 )
-                .shadow(color: Color.wgAccent.opacity(highlighted ? 0.45 : 0.18),
-                        radius: highlighted ? 14 : 8, y: 4)
+                .shadow(color: Color.wgAccent.opacity(highlighted ? 0.7 : 0.18),
+                        radius: highlighted ? (haloPulse ? 26 : 16) : 8,
+                        y: highlighted ? 0 : 4)
+                .shadow(color: Color.wgAccent.opacity(highlighted ? (haloPulse ? 0.55 : 0.3) : 0),
+                        radius: highlighted ? (haloPulse ? 48 : 32) : 0)
         }
+        #if os(tvOS)
+        .buttonStyle(NoChromeTVButtonStyle())
+        .focused($focused)
+        .focusEffectDisabled()
+        .animation(.spring(response: 0.32, dampingFraction: 0.78), value: focused)
+        .onChange(of: focused) { _, isFocused in
+            if isFocused {
+                withAnimation(.easeInOut(duration: 1.2).repeatForever(autoreverses: true)) {
+                    haloPulse = true
+                }
+            } else {
+                withAnimation(.easeOut(duration: 0.3)) {
+                    haloPulse = false
+                }
+            }
+        }
+        #else
         .buttonStyle(.plain)
-        #if os(macOS)
         .onHover { hover = $0 }
         .help(muted ? "Unmute" : "Mute")
         .animation(.spring(response: 0.32, dampingFraction: 0.78), value: hover)
-        #elseif os(tvOS)
-        .focused($focused)
-        .animation(.spring(response: 0.32, dampingFraction: 0.78), value: focused)
         #endif
         .animation(.easeOut(duration: 0.15), value: muted)
     }
@@ -178,6 +204,7 @@ private struct HowToPlayPill: View {
     @State private var hover = false
     #elseif os(tvOS)
     @FocusState private var focused: Bool
+    @State private var haloPulse = false
     #endif
 
     private var highlighted: Bool {
@@ -210,21 +237,37 @@ private struct HowToPlayPill: View {
             )
             .overlay(
                 Capsule().stroke(
-                    highlighted ? Color.wgPrimary : Color.wgPrimary.opacity(0.45),
+                    Color.wgPrimary.opacity(highlighted ? 0 : 0.45),
                     lineWidth: 1.2
                 )
             )
-            .shadow(color: Color.wgPrimary.opacity(highlighted ? 0.45 : 0.18),
-                    radius: highlighted ? 14 : 8, y: 4)
+            .shadow(color: Color.wgPrimary.opacity(highlighted ? 0.7 : 0.18),
+                    radius: highlighted ? (haloPulse ? 26 : 16) : 8,
+                    y: highlighted ? 0 : 4)
+            .shadow(color: Color.wgPrimary.opacity(highlighted ? (haloPulse ? 0.55 : 0.3) : 0),
+                    radius: highlighted ? (haloPulse ? 48 : 32) : 0)
         }
+        #if os(tvOS)
+        .buttonStyle(NoChromeTVButtonStyle())
+        .focused($focused)
+        .focusEffectDisabled()
+        .animation(.spring(response: 0.32, dampingFraction: 0.78), value: focused)
+        .onChange(of: focused) { _, isFocused in
+            if isFocused {
+                withAnimation(.easeInOut(duration: 1.2).repeatForever(autoreverses: true)) {
+                    haloPulse = true
+                }
+            } else {
+                withAnimation(.easeOut(duration: 0.3)) {
+                    haloPulse = false
+                }
+            }
+        }
+        #else
         .buttonStyle(.plain)
-        #if os(macOS)
         .onHover { hover = $0 }
         .help("menu.howToPlay")
         .animation(.spring(response: 0.32, dampingFraction: 0.78), value: hover)
-        #elseif os(tvOS)
-        .focused($focused)
-        .animation(.spring(response: 0.32, dampingFraction: 0.78), value: focused)
         #endif
     }
 }

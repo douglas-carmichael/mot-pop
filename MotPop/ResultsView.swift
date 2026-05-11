@@ -125,6 +125,10 @@ private struct AnswerGrid: View {
             LazyVGrid(columns: columns, spacing: 16) {
                 ForEach(Array(answers.enumerated()), id: \.element.id) { index, answer in
                     AnswerCard(question: question, answer: answer, index: index)
+                        #if os(tvOS)
+                        .focusable()
+                        .focusEffectDisabled()
+                        #endif
                 }
             }
             .padding(.vertical, 4)
@@ -186,6 +190,10 @@ private struct AnswerCard: View {
 
 private struct FinalResultsView: View {
     @EnvironmentObject var session: GameSession
+    #if os(tvOS)
+    @State private var autoScrollActive = true
+    @State private var autoScrollPhase = 0
+    #endif
 
     var body: some View {
         ZStack {
@@ -212,6 +220,31 @@ private struct FinalResultsView: View {
                     .foregroundStyle(Color.wgMuted)
 
                 Card {
+                    #if os(tvOS)
+                    ScrollViewReader { proxy in
+                        ScrollView {
+                            VStack(spacing: 14) {
+                                ForEach(session.roundResults) { result in
+                                    FinalRoundRow(result: result)
+                                        .focusable()
+                                        .focusEffectDisabled()
+                                        .id(result.id)
+                                }
+                            }
+                        }
+                        .frame(maxHeight: 520)
+                        .onChange(of: autoScrollPhase) { _, phase in
+                            guard phase > 0, phase <= session.roundResults.count else { return }
+                            let target = session.roundResults[phase - 1].id
+                            withAnimation(.easeInOut(duration: 2.0)) {
+                                proxy.scrollTo(target, anchor: .top)
+                            }
+                        }
+                    }
+                    .onExitCommand {
+                        autoScrollActive = false
+                    }
+                    #else
                     ScrollView {
                         VStack(spacing: 14) {
                             ForEach(session.roundResults) { result in
@@ -220,6 +253,7 @@ private struct FinalResultsView: View {
                         }
                     }
                     .frame(maxHeight: 320)
+                    #endif
                 }
                 .frame(maxWidth: 720)
 
@@ -235,6 +269,17 @@ private struct FinalResultsView: View {
             }
         }
         .onAppear { SoundEngine.shared.celebration() }
+        #if os(tvOS)
+        .task {
+            guard session.roundResults.count > 1 else { return }
+            try? await Task.sleep(for: .seconds(3))
+            for i in 1...session.roundResults.count {
+                guard autoScrollActive else { break }
+                autoScrollPhase = i
+                try? await Task.sleep(for: .seconds(4))
+            }
+        }
+        #endif
     }
 }
 

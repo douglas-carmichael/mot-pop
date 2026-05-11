@@ -28,11 +28,16 @@ struct PrimaryButton: View {
 
     #if os(macOS)
     @State private var hovering = false
+    #elseif os(tvOS)
+    @FocusState private var focused: Bool
+    @State private var haloPulse = false
     #endif
 
     private var highlighted: Bool {
         #if os(macOS)
         return hovering
+        #elseif os(tvOS)
+        return focused
         #else
         return false
         #endif
@@ -53,17 +58,34 @@ struct PrimaryButton: View {
             )
             .overlay(
                 RoundedRectangle(cornerRadius: 14, style: .continuous)
-                    .stroke(color.opacity(0.5), lineWidth: 1)
+                    .stroke(color.opacity(highlighted ? 0 : 0.5), lineWidth: 1)
             )
             .foregroundStyle(.black)
-            .shadow(color: color.opacity(highlighted ? 0.55 : 0.3), radius: highlighted ? 16 : 8, x: 0, y: 6)
+            .shadow(color: color.opacity(highlighted ? 0.7 : 0.3),
+                    radius: highlighted ? (haloPulse ? 26 : 16) : 8, x: 0,
+                    y: highlighted ? 0 : 6)
+            .shadow(color: color.opacity(highlighted ? (haloPulse ? 0.55 : 0.3) : 0),
+                    radius: highlighted ? (haloPulse ? 48 : 32) : 0)
             .scaleEffect(highlighted ? 1.02 : 1.0)
-            #if os(tvOS)
-            .hoverEffect(.lift)
-            #endif
         }
+        #if os(tvOS)
+        .buttonStyle(NoChromeTVButtonStyle())
+        .focused($focused)
+        .focusEffectDisabled()
+        .animation(.spring(response: 0.32, dampingFraction: 0.78), value: focused)
+        .onChange(of: focused) { _, isFocused in
+            if isFocused {
+                withAnimation(.easeInOut(duration: 1.2).repeatForever(autoreverses: true)) {
+                    haloPulse = true
+                }
+            } else {
+                withAnimation(.easeOut(duration: 0.3)) {
+                    haloPulse = false
+                }
+            }
+        }
+        #else
         .buttonStyle(.plain)
-        #if os(macOS)
         .onHover { hovering = $0 }
         .animation(.easeOut(duration: 0.18), value: hovering)
         #endif
@@ -77,11 +99,16 @@ struct GhostButton: View {
 
     #if os(macOS)
     @State private var hovering = false
+    #elseif os(tvOS)
+    @FocusState private var focused: Bool
+    @State private var haloPulse = false
     #endif
 
     private var highlighted: Bool {
         #if os(macOS)
         return hovering
+        #elseif os(tvOS)
+        return focused
         #else
         return false
         #endif
@@ -97,19 +124,37 @@ struct GhostButton: View {
             .padding(.vertical, 10)
             .background(
                 RoundedRectangle(cornerRadius: 12, style: .continuous)
-                    .fill(Color.white.opacity(highlighted ? 0.10 : 0.06))
+                    .fill(highlighted ? Color.wgAccent : Color.white.opacity(0.06))
             )
             .overlay(
                 RoundedRectangle(cornerRadius: 12, style: .continuous)
-                    .stroke(Color.white.opacity(0.14), lineWidth: 1)
+                    .stroke(Color.wgAccent.opacity(highlighted ? 0 : 0.14), lineWidth: 1)
             )
-            .foregroundStyle(.white)
-            #if os(tvOS)
-            .hoverEffect(.lift)
-            #endif
+            .foregroundStyle(highlighted ? Color.black : Color.white)
+            .shadow(color: Color.wgAccent.opacity(highlighted ? 0.7 : 0.18),
+                    radius: highlighted ? (haloPulse ? 26 : 16) : 8,
+                    y: highlighted ? 0 : 4)
+            .shadow(color: Color.wgAccent.opacity(highlighted ? (haloPulse ? 0.55 : 0.3) : 0),
+                    radius: highlighted ? (haloPulse ? 48 : 32) : 0)
         }
+        #if os(tvOS)
+        .buttonStyle(NoChromeTVButtonStyle())
+        .focused($focused)
+        .focusEffectDisabled()
+        .animation(.spring(response: 0.32, dampingFraction: 0.78), value: focused)
+        .onChange(of: focused) { _, isFocused in
+            if isFocused {
+                withAnimation(.easeInOut(duration: 1.2).repeatForever(autoreverses: true)) {
+                    haloPulse = true
+                }
+            } else {
+                withAnimation(.easeOut(duration: 0.3)) {
+                    haloPulse = false
+                }
+            }
+        }
+        #else
         .buttonStyle(.plain)
-        #if os(macOS)
         .onHover { hovering = $0 }
         .animation(.easeOut(duration: 0.18), value: hovering)
         #endif
