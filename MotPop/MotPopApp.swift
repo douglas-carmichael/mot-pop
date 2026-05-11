@@ -50,6 +50,7 @@ struct RootView: View {
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .padding(36)
 
+            #if !os(tvOS)
             if session.showHowToPlay {
                 HowToPlayView(isPresented: Binding(
                     get: { session.showHowToPlay },
@@ -58,7 +59,19 @@ struct RootView: View {
                 .transition(.opacity)
                 .zIndex(100)
             }
+            #endif
         }
+        #if os(tvOS)
+        .fullScreenCover(isPresented: Binding(
+            get: { session.showHowToPlay },
+            set: { session.showHowToPlay = $0 }
+        )) {
+            HowToPlayView(isPresented: Binding(
+                get: { session.showHowToPlay },
+                set: { session.showHowToPlay = $0 }
+            ))
+        }
+        #endif
         .animation(.spring(response: 0.45, dampingFraction: 0.85), value: session.phase)
         .animation(.easeInOut(duration: 0.18), value: session.showHowToPlay)
     }

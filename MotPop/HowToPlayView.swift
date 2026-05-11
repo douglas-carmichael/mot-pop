@@ -5,12 +5,60 @@ struct HowToPlayView: View {
     @State private var appeared = false
 
     var body: some View {
+        #if os(tvOS)
+        tvBody
+        #else
+        macBody
+        #endif
+    }
+
+    #if os(tvOS)
+    private var tvBody: some View {
+        ZStack {
+            Color.wgBackground.ignoresSafeArea()
+
+            VStack(spacing: 0) {
+                header
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 18) {
+                        IntroBlurb().focusable()
+                        StepRow(number: 1,
+                                systemImage: "rectangle.stack.fill",
+                                accent: .wgPrimary,
+                                title: "howto.step1.title",
+                                detail: "howto.step1.body").focusable()
+                        StepRow(number: 2,
+                                systemImage: "text.bubble.fill",
+                                accent: .wgAccent,
+                                title: "howto.step2.title",
+                                detail: "howto.step2.body").focusable()
+                        ExampleSentence().focusable()
+                        StepRow(number: 3,
+                                systemImage: "timer",
+                                accent: .wgWaiting,
+                                title: "howto.step3.title",
+                                detail: "howto.step3.body").focusable()
+                        StepRow(number: 4,
+                                systemImage: "rectangle.grid.2x2.fill",
+                                accent: .wgGood,
+                                title: "howto.step4.title",
+                                detail: "howto.step4.body").focusable()
+                        TipsBlock().focusable()
+                        CreditsBlock().focusable()
+                    }
+                    .padding(28)
+                }
+            }
+            .frame(maxWidth: 720)
+        }
+    }
+    #endif
+
+    private var macBody: some View {
         ZStack {
             Color.black.opacity(0.55)
                 .ignoresSafeArea()
-                #if !os(tvOS)
                 .onTapGesture { close() }
-                #endif
 
             VStack(spacing: 0) {
                 header
@@ -69,9 +117,6 @@ struct HowToPlayView: View {
             .scaleEffect(appeared ? 1 : 0.94)
             .opacity(appeared ? 1 : 0)
         }
-        #if os(tvOS)
-        .onExitCommand { close() }
-        #endif
         .onAppear {
             withAnimation(.spring(response: 0.45, dampingFraction: 0.82)) { appeared = true }
         }
@@ -91,13 +136,29 @@ struct HowToPlayView: View {
                     .foregroundStyle(.white)
             }
             Spacer()
+            #if os(tvOS)
+            Button(action: close) {
+                HStack(spacing: 8) {
+                    Image(systemName: "xmark.circle.fill")
+                        .font(.system(size: 20, weight: .bold))
+                    Text("action.close")
+                        .font(.system(.headline, design: .rounded).weight(.semibold))
+                }
+                .foregroundStyle(Color.wgMuted)
+                .padding(.horizontal, 16)
+                .padding(.vertical, 10)
+                .background(Capsule().fill(Color.white.opacity(0.08)))
+                .overlay(Capsule().stroke(Color.white.opacity(0.14), lineWidth: 1))
+                .hoverEffect(.lift)
+            }
+            .buttonStyle(.plain)
+            #else
             Button(action: close) {
                 Image(systemName: "xmark.circle.fill")
                     .font(.system(size: 26))
                     .foregroundStyle(Color.wgMuted)
             }
             .buttonStyle(.plain)
-            #if !os(tvOS)
             .keyboardShortcut(.cancelAction)
             #endif
         }
@@ -107,8 +168,12 @@ struct HowToPlayView: View {
     }
 
     private func close() {
+        #if os(tvOS)
+        isPresented = false
+        #else
         withAnimation(.easeOut(duration: 0.18)) { appeared = false }
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.18) { isPresented = false }
+        #endif
     }
 }
 
@@ -257,7 +322,7 @@ private struct CreditsBlock: View {
                                              email: "amelie@pmdapp.fr",
                                              link: "https://github.com/AisakaPMD")
                             ])
-                CreditEntry(role: "howto.credits.portRole",
+                CreditEntry(role: portRoleKey,
                             people: [
                                 CreditPerson(name: "Douglas Carmichael",
                                              email: "dcarmich@dcarmichael.net",
@@ -275,6 +340,14 @@ private struct CreditsBlock: View {
             RoundedRectangle(cornerRadius: 14, style: .continuous)
                 .stroke(Color.wgAccent.opacity(0.18), lineWidth: 1)
         )
+    }
+
+    private var portRoleKey: LocalizedStringKey {
+        #if os(tvOS)
+        "howto.credits.portRole.tvos"
+        #else
+        "howto.credits.portRole"
+        #endif
     }
 }
 
@@ -315,31 +388,22 @@ private struct CreditEntry: View {
                             .foregroundStyle(Color.wgAccent)
                     }
                     #endif
-                    if let linkString = person.link {
+                    #if !os(tvOS)
+                    if let linkString = person.link,
+                       let url = URL(string: linkString) {
                         Text("·")
                             .foregroundStyle(Color.wgMuted)
-                        #if os(tvOS)
-                        HStack(spacing: 4) {
-                            Image(systemName: "link")
-                                .font(.system(size: 10))
-                            Text(linkString.replacingOccurrences(of: "https://", with: ""))
-                                .font(.system(.caption, design: .monospaced))
-                        }
-                        .foregroundStyle(Color.wgAccent)
-                        #else
-                        if let url = URL(string: linkString) {
-                            Link(destination: url) {
-                                HStack(spacing: 4) {
-                                    Image(systemName: "link")
-                                        .font(.system(size: 10))
-                                    Text(linkString.replacingOccurrences(of: "https://", with: ""))
-                                        .font(.system(.caption, design: .monospaced))
-                                }
-                                .foregroundStyle(Color.wgAccent)
+                        Link(destination: url) {
+                            HStack(spacing: 4) {
+                                Image(systemName: "link")
+                                    .font(.system(size: 10))
+                                Text(linkString.replacingOccurrences(of: "https://", with: ""))
+                                    .font(.system(.caption, design: .monospaced))
                             }
+                            .foregroundStyle(Color.wgAccent)
                         }
-                        #endif
                     }
+                    #endif
                 }
             }
         }

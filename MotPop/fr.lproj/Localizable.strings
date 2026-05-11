@@ -35,6 +35,7 @@
 "howto.credits.title" = "Crédits";
 "howto.credits.originalRole" = "Création originale";
 "howto.credits.portRole" = "Portage macOS";
+"howto.credits.portRole.tvos" = "Portage tvOS";
 
 /* Lobby */
 "lobby.solo.title" = "Réglages solo";
@@ -90,6 +91,7 @@
 "action.submit" = "Envoyer";
 "action.leave" = "Quitter";
 "action.kick" = "Exclure le joueur";
+"action.close" = "Fermer";
 "action.backToMenu" = "Retour au menu";
 
 /* Format */

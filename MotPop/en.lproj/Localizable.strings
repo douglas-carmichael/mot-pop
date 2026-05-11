@@ -35,6 +35,7 @@
 "howto.credits.title" = "Credits";
 "howto.credits.originalRole" = "Originally created by";
 "howto.credits.portRole" = "macOS port by";
+"howto.credits.portRole.tvos" = "tvOS port by";
 
 /* Lobby */
 "lobby.solo.title" = "Solo setup";
@@ -90,6 +91,7 @@
 "action.submit" = "Submit";
 "action.leave" = "Leave";
 "action.kick" = "Kick player";
+"action.close" = "Close";
 "action.backToMenu" = "Back to menu";
 
 /* Format */

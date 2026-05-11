@@ -4,6 +4,8 @@ import AVFoundation
 final class SoundEngine {
     static let shared = SoundEngine()
 
+    var isMuted: Bool = false
+
     private let engine = AVAudioEngine()
     private let player = AVAudioPlayerNode()
     private let sampleRate: Double = 44100
@@ -21,6 +23,7 @@ final class SoundEngine {
     }
 
     private func play(_ buffer: AVAudioPCMBuffer) {
+        guard !isMuted else { return }
         ensureRunning()
         player.scheduleBuffer(buffer, at: nil, options: .interrupts)
         if !player.isPlaying { player.play() }

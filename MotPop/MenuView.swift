@@ -16,6 +16,7 @@ struct MenuView: View {
         VStack(spacing: 36) {
             HStack {
                 Spacer()
+                MutePill()
                 HowToPlayPill {
                     session.showHowToPlay = true
                 }
@@ -101,12 +102,72 @@ struct MenuView: View {
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
 
-            HowToPlayPill {
-                session.showHowToPlay = true
+            HStack(spacing: 8) {
+                MutePill()
+                HowToPlayPill {
+                    session.showHowToPlay = true
+                }
             }
             .padding(.top, 4)
             .padding(.trailing, 4)
         }
+    }
+}
+
+private struct MutePill: View {
+    @State private var muted = SoundEngine.shared.isMuted
+
+    #if os(macOS)
+    @State private var hover = false
+    #elseif os(tvOS)
+    @FocusState private var focused: Bool
+    #endif
+
+    private var highlighted: Bool {
+        #if os(macOS)
+        return hover
+        #elseif os(tvOS)
+        return focused
+        #else
+        return false
+        #endif
+    }
+
+    var body: some View {
+        Button {
+            muted.toggle()
+            SoundEngine.shared.isMuted = muted
+        } label: {
+            Image(systemName: muted ? "speaker.slash.fill" : "speaker.wave.2.fill")
+                .font(.system(size: 16, weight: .bold))
+                .foregroundStyle(highlighted ? Color.black : Color.white)
+                .frame(width: 40, height: 36)
+                .background(
+                    Capsule().fill(
+                        highlighted
+                            ? Color.wgAccent
+                            : Color.white.opacity(0.08)
+                    )
+                )
+                .overlay(
+                    Capsule().stroke(
+                        highlighted ? Color.wgAccent : Color.wgAccent.opacity(0.45),
+                        lineWidth: 1.2
+                    )
+                )
+                .shadow(color: Color.wgAccent.opacity(highlighted ? 0.45 : 0.18),
+                        radius: highlighted ? 14 : 8, y: 4)
+        }
+        .buttonStyle(.plain)
+        #if os(macOS)
+        .onHover { hover = $0 }
+        .help(muted ? "Unmute" : "Mute")
+        .animation(.spring(response: 0.32, dampingFraction: 0.78), value: hover)
+        #elseif os(tvOS)
+        .focused($focused)
+        .animation(.spring(response: 0.32, dampingFraction: 0.78), value: focused)
+        #endif
+        .animation(.easeOut(duration: 0.15), value: muted)
     }
 }
 
@@ -115,11 +176,15 @@ private struct HowToPlayPill: View {
 
     #if os(macOS)
     @State private var hover = false
+    #elseif os(tvOS)
+    @FocusState private var focused: Bool
     #endif
 
     private var highlighted: Bool {
         #if os(macOS)
         return hover
+        #elseif os(tvOS)
+        return focused
         #else
         return false
         #endif
@@ -151,15 +216,15 @@ private struct HowToPlayPill: View {
             )
             .shadow(color: Color.wgPrimary.opacity(highlighted ? 0.45 : 0.18),
                     radius: highlighted ? 14 : 8, y: 4)
-            #if os(tvOS)
-            .hoverEffect(.lift)
-            #endif
         }
         .buttonStyle(.plain)
         #if os(macOS)
         .onHover { hover = $0 }
         .help("menu.howToPlay")
         .animation(.spring(response: 0.32, dampingFraction: 0.78), value: hover)
+        #elseif os(tvOS)
+        .focused($focused)
+        .animation(.spring(response: 0.32, dampingFraction: 0.78), value: focused)
         #endif
     }
 }
