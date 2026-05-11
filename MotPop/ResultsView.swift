@@ -1,5 +1,9 @@
 import SwiftUI
+#if os(macOS)
 import AppKit
+#elseif os(tvOS)
+import UIKit
+#endif
 
 struct ResultsView: View {
     @EnvironmentObject var session: GameSession
@@ -55,13 +59,21 @@ private struct RoundResultsView: View {
                     }
                 } else {
                     HStack(spacing: 8) {
-                        ProgressView().controlSize(.small).tint(.wgPrimary)
+                        ProgressView()
+                            #if os(macOS)
+                            .controlSize(.small)
+                            #endif
+                            .tint(.wgPrimary)
                         Text("results.waitingHost")
                             .foregroundStyle(Color.wgMuted)
                     }
                 }
             }
+            #if os(tvOS)
+            .focusSection()
+            #endif
         }
+        .onAppear { SoundEngine.shared.resultsReveal() }
     }
 
     private var currentResult: RoundResult? {
@@ -222,6 +234,7 @@ private struct FinalResultsView: View {
                 Spacer()
             }
         }
+        .onAppear { SoundEngine.shared.celebration() }
     }
 }
 
@@ -265,6 +278,7 @@ private struct FinalRoundRow: View {
 
 // MARK: - Confetti (CAEmitterLayer)
 
+#if os(macOS)
 private struct ConfettiView: NSViewRepresentable {
     func makeNSView(context: Context) -> NSView {
         let view = ConfettiHostView()
@@ -310,7 +324,7 @@ private final class ConfettiHostView: NSView {
             c.lifetime = 6.5
             c.velocity = 160
             c.velocityRange = 60
-            c.emissionLongitude = .pi    // downward
+            c.emissionLongitude = .pi
             c.emissionRange = .pi / 5
             c.spin = 3
             c.spinRange = 3
@@ -325,7 +339,6 @@ private final class ConfettiHostView: NSView {
         }
         emitter = layer
 
-        // Burst then taper
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.6) { [weak self] in
             self?.emitter?.birthRate = 0.4
         }
@@ -341,3 +354,79 @@ private final class ConfettiHostView: NSView {
         return image
     }
 }
+#endif
+
+#if os(tvOS)
+private struct ConfettiView: UIViewRepresentable {
+    func makeUIView(context: Context) -> UIView {
+        let view = ConfettiHostView()
+        return view
+    }
+    func updateUIView(_ uiView: UIView, context: Context) {}
+}
+
+private final class ConfettiHostView: UIView {
+    private var emitter: CAEmitterLayer?
+
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        backgroundColor = .clear
+        setupEmitter()
+    }
+    required init?(coder: NSCoder) {
+        super.init(coder: coder)
+        backgroundColor = .clear
+        setupEmitter()
+    }
+
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        emitter?.frame = bounds
+        emitter?.emitterPosition = CGPoint(x: bounds.midX, y: -12)
+        emitter?.emitterSize = CGSize(width: bounds.width, height: 2)
+    }
+
+    private func setupEmitter() {
+        let emitterLayer = CAEmitterLayer()
+        emitterLayer.emitterShape = .line
+        let colors: [UIColor] = [
+            UIColor(red: 0.96, green: 0.47, blue: 1.0, alpha: 1),
+            UIColor(red: 0.47, green: 0.69, blue: 1.0, alpha: 1),
+            UIColor(red: 1.0, green: 0.92, blue: 0.47, alpha: 1),
+            UIColor(red: 0.47, green: 1.0, blue: 0.65, alpha: 1),
+            UIColor(red: 1.0, green: 0.69, blue: 0.47, alpha: 1)
+        ]
+        let cells: [CAEmitterCell] = colors.map { color in
+            let c = CAEmitterCell()
+            c.birthRate = 4
+            c.lifetime = 6.5
+            c.velocity = 160
+            c.velocityRange = 60
+            c.emissionLongitude = .pi / 2
+            c.emissionRange = .pi / 5
+            c.spin = 3
+            c.spinRange = 3
+            c.scale = 0.5
+            c.scaleRange = 0.25
+            c.contents = ConfettiHostView.makeRect(color: color)?.cgImage
+            return c
+        }
+        emitterLayer.emitterCells = cells
+        layer.addSublayer(emitterLayer)
+        emitter = emitterLayer
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.6) { [weak self] in
+            self?.emitter?.birthRate = 0.4
+        }
+    }
+
+    private static func makeRect(color: UIColor) -> UIImage? {
+        let size = CGSize(width: 8, height: 14)
+        let renderer = UIGraphicsImageRenderer(size: size)
+        return renderer.image { ctx in
+            color.setFill()
+            UIBezierPath(roundedRect: CGRect(origin: .zero, size: size), cornerRadius: 1.5).fill()
+        }
+    }
+}
+#endif

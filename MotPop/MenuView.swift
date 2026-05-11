@@ -4,6 +4,65 @@ struct MenuView: View {
     @EnvironmentObject var session: GameSession
 
     var body: some View {
+        #if os(tvOS)
+        tvBody
+        #else
+        macBody
+        #endif
+    }
+
+    #if os(tvOS)
+    private var tvBody: some View {
+        VStack(spacing: 36) {
+            HStack {
+                Spacer()
+                HowToPlayPill {
+                    session.showHowToPlay = true
+                }
+            }
+            .focusSection()
+
+            HeroHeader()
+
+            HStack(spacing: 22) {
+                MenuCard(
+                    title: "menu.solo.title",
+                    subtitle: "menu.solo.subtitle",
+                    systemImage: "person.fill",
+                    accent: .wgPrimary
+                ) {
+                    session.startSinglePlayer(rounds: 5, bots: 3)
+                }
+                MenuCard(
+                    title: "menu.host.title",
+                    subtitle: "menu.host.subtitle",
+                    systemImage: "antenna.radiowaves.left.and.right",
+                    accent: .wgAccent
+                ) {
+                    session.startHosting()
+                }
+                MenuCard(
+                    title: "menu.join.title",
+                    subtitle: "menu.join.subtitle",
+                    systemImage: "magnifyingglass",
+                    accent: .wgGood
+                ) {
+                    session.startBrowsing()
+                }
+            }
+            .frame(maxWidth: 1400)
+            .focusSection()
+
+            NameField()
+                .frame(maxWidth: 480)
+
+            Spacer(minLength: 0)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+    }
+    #endif
+
+    private var macBody: some View {
         ZStack(alignment: .topTrailing) {
             VStack(spacing: 36) {
                 HeroHeader()
@@ -42,7 +101,6 @@ struct MenuView: View {
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
 
-            // Pinned "How to play" — always visible, never below the fold.
             HowToPlayPill {
                 session.showHowToPlay = true
             }
@@ -54,7 +112,18 @@ struct MenuView: View {
 
 private struct HowToPlayPill: View {
     var action: () -> Void
+
+    #if os(macOS)
     @State private var hover = false
+    #endif
+
+    private var highlighted: Bool {
+        #if os(macOS)
+        return hover
+        #else
+        return false
+        #endif
+    }
 
     var body: some View {
         Button(action: action) {
@@ -64,29 +133,34 @@ private struct HowToPlayPill: View {
                 Text("menu.howToPlay")
                     .font(.system(.subheadline, design: .rounded).weight(.semibold))
             }
-            .foregroundStyle(hover ? Color.black : Color.white)
+            .foregroundStyle(highlighted ? Color.black : Color.white)
             .padding(.horizontal, 16)
             .padding(.vertical, 10)
             .background(
                 Capsule().fill(
-                    hover
+                    highlighted
                         ? Color.wgPrimary
                         : Color.white.opacity(0.08)
                 )
             )
             .overlay(
                 Capsule().stroke(
-                    hover ? Color.wgPrimary : Color.wgPrimary.opacity(0.45),
+                    highlighted ? Color.wgPrimary : Color.wgPrimary.opacity(0.45),
                     lineWidth: 1.2
                 )
             )
-            .shadow(color: Color.wgPrimary.opacity(hover ? 0.45 : 0.18),
-                    radius: hover ? 14 : 8, y: 4)
+            .shadow(color: Color.wgPrimary.opacity(highlighted ? 0.45 : 0.18),
+                    radius: highlighted ? 14 : 8, y: 4)
+            #if os(tvOS)
+            .hoverEffect(.lift)
+            #endif
         }
         .buttonStyle(.plain)
+        #if os(macOS)
         .onHover { hover = $0 }
         .help("menu.howToPlay")
         .animation(.spring(response: 0.32, dampingFraction: 0.78), value: hover)
+        #endif
     }
 }
 
@@ -142,9 +216,60 @@ private struct MenuCard: View {
     var accent: Color
     var action: () -> Void
 
+    #if os(macOS)
     @State private var hover = false
+    #endif
+
+    private var highlighted: Bool {
+        #if os(macOS)
+        return hover
+        #else
+        return false
+        #endif
+    }
 
     var body: some View {
+        #if os(tvOS)
+        tvBody
+        #else
+        macBody
+        #endif
+    }
+
+    #if os(tvOS)
+    private var tvBody: some View {
+        Button(action: action) {
+            VStack(spacing: 18) {
+                ZStack {
+                    RoundedRectangle(cornerRadius: 16, style: .continuous)
+                        .fill(accent.opacity(0.22))
+                        .frame(width: 70, height: 70)
+                    Image(systemName: systemImage)
+                        .font(.system(size: 30, weight: .bold))
+                        .foregroundStyle(accent)
+                }
+                VStack(spacing: 8) {
+                    Text(title)
+                        .font(.system(.title2, design: .rounded).weight(.bold))
+                        .foregroundStyle(.white)
+                        .lineLimit(2)
+                        .minimumScaleFactor(0.75)
+                    Text(subtitle)
+                        .font(.system(.title3, design: .rounded))
+                        .foregroundStyle(Color.wgMuted)
+                        .lineLimit(2)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+            }
+            .padding(28)
+            .frame(maxWidth: .infinity, minHeight: 280)
+        }
+        .buttonStyle(.card)
+    }
+    #endif
+
+    #if os(macOS)
+    private var macBody: some View {
         Button(action: action) {
             VStack(alignment: .leading, spacing: 18) {
                 ZStack {
@@ -210,6 +335,7 @@ private struct MenuCard: View {
         .onHover { hover = $0 }
         .animation(.spring(response: 0.35, dampingFraction: 0.7), value: hover)
     }
+    #endif
 }
 
 private struct NameField: View {
@@ -224,7 +350,9 @@ private struct NameField: View {
             HStack(spacing: 12) {
                 Avatar(name: session.localPlayerName, size: 36)
                 TextField("menu.name.placeholder", text: $session.localPlayerName)
+                    #if os(macOS)
                     .textFieldStyle(.plain)
+                    #endif
                     .font(.system(.title3, design: .rounded).weight(.medium))
                     .foregroundStyle(.white)
                     .focused($focused)

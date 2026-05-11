@@ -8,7 +8,9 @@ struct HowToPlayView: View {
         ZStack {
             Color.black.opacity(0.55)
                 .ignoresSafeArea()
+                #if !os(tvOS)
                 .onTapGesture { close() }
+                #endif
 
             VStack(spacing: 0) {
                 header
@@ -67,6 +69,9 @@ struct HowToPlayView: View {
             .scaleEffect(appeared ? 1 : 0.94)
             .opacity(appeared ? 1 : 0)
         }
+        #if os(tvOS)
+        .onExitCommand { close() }
+        #endif
         .onAppear {
             withAnimation(.spring(response: 0.45, dampingFraction: 0.82)) { appeared = true }
         }
@@ -92,7 +97,9 @@ struct HowToPlayView: View {
                     .foregroundStyle(Color.wgMuted)
             }
             .buttonStyle(.plain)
+            #if !os(tvOS)
             .keyboardShortcut(.cancelAction)
+            #endif
         }
         .padding(.horizontal, 28)
         .padding(.top, 24)
@@ -293,6 +300,13 @@ private struct CreditEntry: View {
                     Text(person.name)
                         .font(.system(.body, design: .rounded).weight(.semibold))
                         .foregroundStyle(.white)
+                    #if os(tvOS)
+                    Text("·")
+                        .foregroundStyle(Color.wgMuted)
+                    Text(person.email)
+                        .font(.system(.caption, design: .monospaced))
+                        .foregroundStyle(Color.wgAccent)
+                    #else
                     Text("·")
                         .foregroundStyle(Color.wgMuted)
                     if let url = URL(string: "mailto:\(person.email)") {
@@ -300,18 +314,31 @@ private struct CreditEntry: View {
                             .font(.system(.caption, design: .monospaced))
                             .foregroundStyle(Color.wgAccent)
                     }
-                    if let linkString = person.link, let url = URL(string: linkString) {
+                    #endif
+                    if let linkString = person.link {
                         Text("·")
                             .foregroundStyle(Color.wgMuted)
-                        Link(destination: url) {
-                            HStack(spacing: 4) {
-                                Image(systemName: "link")
-                                    .font(.system(size: 10))
-                                Text(linkString.replacingOccurrences(of: "https://", with: ""))
-                                    .font(.system(.caption, design: .monospaced))
-                            }
-                            .foregroundStyle(Color.wgAccent)
+                        #if os(tvOS)
+                        HStack(spacing: 4) {
+                            Image(systemName: "link")
+                                .font(.system(size: 10))
+                            Text(linkString.replacingOccurrences(of: "https://", with: ""))
+                                .font(.system(.caption, design: .monospaced))
                         }
+                        .foregroundStyle(Color.wgAccent)
+                        #else
+                        if let url = URL(string: linkString) {
+                            Link(destination: url) {
+                                HStack(spacing: 4) {
+                                    Image(systemName: "link")
+                                        .font(.system(size: 10))
+                                    Text(linkString.replacingOccurrences(of: "https://", with: ""))
+                                        .font(.system(.caption, design: .monospaced))
+                                }
+                                .foregroundStyle(Color.wgAccent)
+                            }
+                        }
+                        #endif
                     }
                 }
             }

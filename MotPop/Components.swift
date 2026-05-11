@@ -26,7 +26,17 @@ struct PrimaryButton: View {
     var color: Color = .wgPrimary
     var action: () -> Void
 
+    #if os(macOS)
     @State private var hovering = false
+    #endif
+
+    private var highlighted: Bool {
+        #if os(macOS)
+        return hovering
+        #else
+        return false
+        #endif
+    }
 
     var body: some View {
         Button(action: action) {
@@ -39,19 +49,24 @@ struct PrimaryButton: View {
             .padding(.vertical, 12)
             .background(
                 RoundedRectangle(cornerRadius: 14, style: .continuous)
-                    .fill(color.opacity(hovering ? 0.95 : 0.82))
+                    .fill(color.opacity(highlighted ? 0.95 : 0.82))
             )
             .overlay(
                 RoundedRectangle(cornerRadius: 14, style: .continuous)
                     .stroke(color.opacity(0.5), lineWidth: 1)
             )
             .foregroundStyle(.black)
-            .shadow(color: color.opacity(hovering ? 0.55 : 0.3), radius: hovering ? 16 : 8, x: 0, y: 6)
-            .scaleEffect(hovering ? 1.02 : 1.0)
+            .shadow(color: color.opacity(highlighted ? 0.55 : 0.3), radius: highlighted ? 16 : 8, x: 0, y: 6)
+            .scaleEffect(highlighted ? 1.02 : 1.0)
+            #if os(tvOS)
+            .hoverEffect(.lift)
+            #endif
         }
         .buttonStyle(.plain)
+        #if os(macOS)
         .onHover { hovering = $0 }
         .animation(.easeOut(duration: 0.18), value: hovering)
+        #endif
     }
 }
 
@@ -60,7 +75,17 @@ struct GhostButton: View {
     var systemImage: String? = nil
     var action: () -> Void
 
+    #if os(macOS)
     @State private var hovering = false
+    #endif
+
+    private var highlighted: Bool {
+        #if os(macOS)
+        return hovering
+        #else
+        return false
+        #endif
+    }
 
     var body: some View {
         Button(action: action) {
@@ -72,17 +97,22 @@ struct GhostButton: View {
             .padding(.vertical, 10)
             .background(
                 RoundedRectangle(cornerRadius: 12, style: .continuous)
-                    .fill(Color.white.opacity(hovering ? 0.10 : 0.06))
+                    .fill(Color.white.opacity(highlighted ? 0.10 : 0.06))
             )
             .overlay(
                 RoundedRectangle(cornerRadius: 12, style: .continuous)
                     .stroke(Color.white.opacity(0.14), lineWidth: 1)
             )
             .foregroundStyle(.white)
+            #if os(tvOS)
+            .hoverEffect(.lift)
+            #endif
         }
         .buttonStyle(.plain)
+        #if os(macOS)
         .onHover { hovering = $0 }
         .animation(.easeOut(duration: 0.18), value: hovering)
+        #endif
     }
 }
 

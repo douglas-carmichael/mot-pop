@@ -5,6 +5,7 @@ struct GameView: View {
     @State private var answer: String = ""
     @FocusState private var focused: Bool
     @State private var nowTick = Date()
+    @State private var lastWarnedSecond: Int = -1
 
     private let timer = Timer.publish(every: 0.1, on: .main, in: .common).autoconnect()
 
@@ -51,7 +52,9 @@ struct GameView: View {
                 if !session.hasSubmittedAnswer {
                     HStack(spacing: 14) {
                         TextField("game.answer.placeholder", text: $answer)
+                            #if os(macOS)
                             .textFieldStyle(.plain)
+                            #endif
                             .font(.system(.title2, design: .rounded))
                             .padding(.vertical, 12)
                             .padding(.horizontal, 16)
@@ -73,7 +76,11 @@ struct GameView: View {
                     .frame(maxWidth: 760)
                 } else {
                     HStack(spacing: 8) {
-                        ProgressView().controlSize(.small).tint(.wgPrimary)
+                        ProgressView()
+                            #if os(macOS)
+                            .controlSize(.small)
+                            #endif
+                            .tint(.wgPrimary)
                         Text("game.waiting.others")
                             .foregroundStyle(Color.wgMuted)
                     }
@@ -82,17 +89,29 @@ struct GameView: View {
         }
         .onReceive(timer) { date in
             nowTick = date
-            if !session.hasSubmittedAnswer && remaining <= 0 {
+            let r = remaining
+            if !session.hasSubmittedAnswer && r > 0 && r <= 5 && r != lastWarnedSecond {
+                lastWarnedSecond = r
+                SoundEngine.shared.timerWarning()
+            }
+            if !session.hasSubmittedAnswer && r <= 0 {
                 submit()
             }
         }
         .onAppear {
             answer = ""
             focused = true
+            lastWarnedSecond = -1
+            SoundEngine.shared.roundStart()
         }
         .onChange(of: session.currentQuestion?.id) { _, _ in
             answer = ""
             focused = true
+            lastWarnedSecond = -1
+            SoundEngine.shared.roundStart()
+        }
+        .onChange(of: session.hasSubmittedAnswer) { _, submitted in
+            if submitted { SoundEngine.shared.answerSubmit() }
         }
     }
 

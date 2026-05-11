@@ -1,32 +1,32 @@
 import SwiftUI
+#if os(macOS)
 import AppKit
+#endif
 
 @main
 struct MotPopApp: App {
     @StateObject private var session = GameSession()
 
+    #if os(macOS)
     init() {
-        // Mot Pop is a single-window experience — strip out window tabbing,
-        // which removes "Show Tab Bar" and "Show All Tabs" from the View menu.
         NSWindow.allowsAutomaticWindowTabbing = false
     }
+    #endif
 
     var body: some Scene {
         WindowGroup {
             RootView()
                 .environmentObject(session)
+                #if os(macOS)
                 .frame(width: 1100, height: 840)
+                #endif
                 .preferredColorScheme(.dark)
         }
+        #if os(macOS)
         .windowStyle(.hiddenTitleBar)
-        // Fixing the content frame and asking the window to size to its content
-        // produces a non-resizable window (no resize handles, no zoom-grow).
         .windowResizability(.contentSize)
         .commands {
             CommandGroup(replacing: .newItem) { }
-            // Real menu commands intercept key events globally — unlike a
-            // .keyboardShortcut on an in-view Button, they fire even when a
-            // TextField has focus.
             CommandGroup(after: .help) {
                 Button {
                     session.showHowToPlay = true
@@ -36,6 +36,7 @@ struct MotPopApp: App {
                 .keyboardShortcut("?", modifiers: [.command])
             }
         }
+        #endif
     }
 }
 
@@ -49,8 +50,6 @@ struct RootView: View {
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .padding(36)
 
-            // Hosted at the root so the ⌘? menu command can summon it from any
-            // phase, and so it overlays any focused TextField beneath it.
             if session.showHowToPlay {
                 HowToPlayView(isPresented: Binding(
                     get: { session.showHowToPlay },
@@ -94,7 +93,6 @@ private struct BackgroundGradient: View {
             TimelineView(.animation(minimumInterval: 1.0 / 30.0)) { context in
                 let t = context.date.timeIntervalSinceReferenceDate
                 Canvas { ctx, size in
-                    // Three slow-drifting glow blobs
                     drawBlob(ctx: ctx, size: size,
                              color: Color.wgPrimary.opacity(0.30),
                              phase: t * 0.07,
@@ -111,7 +109,6 @@ private struct BackgroundGradient: View {
                 .blur(radius: 60)
                 .blendMode(.plusLighter)
             }
-            // Subtle vignette
             RadialGradient(
                 colors: [Color.clear, Color.black.opacity(0.45)],
                 center: .center,

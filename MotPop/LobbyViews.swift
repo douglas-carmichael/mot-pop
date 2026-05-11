@@ -42,6 +42,9 @@ struct SinglePlayerSetupView: View {
                 }
                 .frame(maxWidth: .infinity)
             }
+            #if os(tvOS)
+            .focusSection()
+            #endif
             HStack {
                 GhostButton(title: NSLocalizedString("action.back", value: "Back", comment: ""),
                             systemImage: "chevron.left") {
@@ -56,10 +59,12 @@ struct SinglePlayerSetupView: View {
                         maxPlayers: Int(bots) + 1
                     )
                     session.startSinglePlayer(rounds: Int(rounds), bots: Int(bots))
-                    // Need a tick to let the bot list rebuild before starting
                     DispatchQueue.main.async { session.startGame() }
                 }
             }
+            #if os(tvOS)
+            .focusSection()
+            #endif
         }
         .onAppear {
             rounds = Double(max(1, session.config.rounds))
@@ -134,13 +139,16 @@ struct HostLobbyView: View {
                                                     .foregroundStyle(Color.wgBad)
                                             }
                                             .buttonStyle(.plain)
-                                            .help(NSLocalizedString("action.kick", value: "Kick player", comment: ""))
                                         }
                                     }
                                 }
                                 if session.players.count < 2 {
                                     HStack(spacing: 10) {
-                                        ProgressView().controlSize(.small).tint(.wgPrimary)
+                                        ProgressView()
+                                            #if os(macOS)
+                                            .controlSize(.small)
+                                            #endif
+                                            .tint(.wgPrimary)
                                         Text("lobby.host.waitingForPlayers")
                                             .foregroundStyle(Color.wgMuted)
                                     }
@@ -152,6 +160,9 @@ struct HostLobbyView: View {
                 }
                 .frame(maxWidth: .infinity, minHeight: 280)
             }
+            #if os(tvOS)
+            .focusSection()
+            #endif
             HStack {
                 GhostButton(title: NSLocalizedString("action.back", value: "Back", comment: ""),
                             systemImage: "chevron.left") {
@@ -170,6 +181,9 @@ struct HostLobbyView: View {
                 .disabled(session.players.count < 1)
                 .opacity(session.players.count < 1 ? 0.5 : 1)
             }
+            #if os(tvOS)
+            .focusSection()
+            #endif
         }
         .onAppear {
             rounds = Double(max(1, session.config.rounds))
@@ -231,7 +245,18 @@ struct BrowseView: View {
 private struct HostRow: View {
     let host: DiscoveredHost
     var action: () -> Void
+
+    #if os(macOS)
     @State private var hover = false
+    #endif
+
+    private var highlighted: Bool {
+        #if os(macOS)
+        return hover
+        #else
+        return false
+        #endif
+    }
 
     var body: some View {
         Button(action: action) {
@@ -253,21 +278,26 @@ private struct HostRow: View {
                 Spacer()
                 Image(systemName: "chevron.right")
                     .foregroundStyle(Color.wgMuted)
-                    .offset(x: hover ? 4 : 0)
+                    .offset(x: highlighted ? 4 : 0)
             }
             .padding(14)
             .background(
                 RoundedRectangle(cornerRadius: 14, style: .continuous)
-                    .fill(Color.white.opacity(hover ? 0.08 : 0.04))
+                    .fill(Color.white.opacity(highlighted ? 0.08 : 0.04))
             )
             .overlay(
                 RoundedRectangle(cornerRadius: 14, style: .continuous)
-                    .stroke(Color.white.opacity(hover ? 0.18 : 0.10), lineWidth: 1)
+                    .stroke(Color.white.opacity(highlighted ? 0.18 : 0.10), lineWidth: 1)
             )
+            #if os(tvOS)
+            .hoverEffect(.lift)
+            #endif
         }
         .buttonStyle(.plain)
+        #if os(macOS)
         .onHover { hover = $0 }
         .animation(.easeOut(duration: 0.18), value: hover)
+        #endif
     }
 }
 
@@ -381,8 +411,31 @@ struct SettingSlider: View {
                     .foregroundStyle(Color.wgPrimary)
                     .monospacedDigit()
             }
+            #if os(tvOS)
+            HStack(spacing: 24) {
+                Button {
+                    value = max(range.lowerBound, value - step)
+                } label: {
+                    Image(systemName: "minus.circle.fill")
+                        .font(.title2)
+                }
+                .disabled(value <= range.lowerBound)
+
+                ProgressView(value: (value - range.lowerBound) / (range.upperBound - range.lowerBound))
+                    .tint(.wgPrimary)
+
+                Button {
+                    value = min(range.upperBound, value + step)
+                } label: {
+                    Image(systemName: "plus.circle.fill")
+                        .font(.title2)
+                }
+                .disabled(value >= range.upperBound)
+            }
+            #else
             Slider(value: $value, in: range, step: step)
                 .tint(.wgPrimary)
+            #endif
         }
     }
 }
@@ -417,6 +470,10 @@ struct CountdownView: View {
                                value: session.countdownSeconds)
             }
             Spacer()
+        }
+        .onAppear { SoundEngine.shared.countdownTick() }
+        .onChange(of: session.countdownSeconds) { _, newValue in
+            SoundEngine.shared.countdownTick(final: newValue <= 0)
         }
     }
 }

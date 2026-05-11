@@ -105,9 +105,6 @@ final class GameSession: ObservableObject {
 
     func startGame() { driver?.startGame() }
     func submitAnswer(_ text: String) {
-        // The driver is responsible for setting `hasSubmittedAnswer` once the
-        // answer has actually been recorded. Setting it here would race with
-        // the driver's own re-entrancy guard and silently drop the answer.
         driver?.submitAnswer(text)
     }
     func nextSlide() { driver?.nextSlide() }
@@ -122,10 +119,18 @@ final class GameSession: ObservableObject {
     // MARK: - Helpers
 
     static func defaultPlayerName() -> String {
+        #if os(macOS)
         let host = Host.current().localizedName ?? NSUserName()
         let trimmed = host.replacingOccurrences(of: "'s Mac", with: "")
                           .replacingOccurrences(of: " Mac", with: "")
         return String(trimmed.prefix(20))
+        #else
+        let name = ProcessInfo.processInfo.hostName
+            .replacingOccurrences(of: ".local", with: "")
+            .replacingOccurrences(of: "-", with: " ")
+        if name.isEmpty { return NSLocalizedString("misc.guest", value: "Guest", comment: "") }
+        return String(name.prefix(20))
+        #endif
     }
 }
 
