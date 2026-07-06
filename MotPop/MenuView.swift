@@ -130,8 +130,8 @@ private struct MutePill: View {
     @State private var hover = false
     #elseif os(tvOS)
     @FocusState private var focused: Bool
-    @State private var haloPulse = false
     #endif
+    @State private var haloPulse = false
 
     private var highlighted: Bool {
         #if os(macOS)
@@ -204,8 +204,8 @@ private struct HowToPlayPill: View {
     @State private var hover = false
     #elseif os(tvOS)
     @FocusState private var focused: Bool
-    @State private var haloPulse = false
     #endif
+    @State private var haloPulse = false
 
     private var highlighted: Bool {
         #if os(macOS)
