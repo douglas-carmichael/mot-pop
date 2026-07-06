@@ -25,6 +25,7 @@ struct MenuView: View {
         VStack(spacing: 36) {
             HStack {
                 Spacer()
+                LanguagePill()
                 MutePill()
                 HowToPlayPill {
                     session.showHowToPlay = true
@@ -112,6 +113,7 @@ struct MenuView: View {
             .frame(maxWidth: .infinity, maxHeight: .infinity)
 
             HStack(spacing: 8) {
+                LanguagePill()
                 MutePill()
                 HowToPlayPill {
                     session.showHowToPlay = true
@@ -120,6 +122,92 @@ struct MenuView: View {
             .padding(.top, 4)
             .padding(.trailing, 4)
         }
+    }
+}
+
+private struct LanguagePill: View {
+    @EnvironmentObject var session: GameSession
+
+    #if os(macOS)
+    @State private var hover = false
+    #elseif os(tvOS)
+    @FocusState private var focused: Bool
+    #endif
+    @State private var haloPulse = false
+
+    private var highlighted: Bool {
+        #if os(macOS)
+        return hover
+        #elseif os(tvOS)
+        return focused
+        #else
+        return false
+        #endif
+    }
+
+    private var flag: String {
+        session.languageCode == "fr" ? "🇫🇷" : "🇬🇧"
+    }
+
+    private var code: String {
+        session.languageCode.uppercased()
+    }
+
+    var body: some View {
+        Button {
+            session.toggleLanguage()
+        } label: {
+            HStack(spacing: 8) {
+                Text(flag)
+                    .font(.system(size: 16))
+                Text(code)
+                    .font(.system(.subheadline, design: .rounded).weight(.bold))
+            }
+            .foregroundStyle(highlighted ? Color.black : Color.white)
+            .padding(.horizontal, 14)
+            .padding(.vertical, 10)
+            .background(
+                Capsule().fill(
+                    highlighted
+                        ? Color.wgGood
+                        : Color.white.opacity(0.08)
+                )
+            )
+            .overlay(
+                Capsule().stroke(
+                    Color.wgGood.opacity(highlighted ? 0 : 0.45),
+                    lineWidth: 1.2
+                )
+            )
+            .shadow(color: Color.wgGood.opacity(highlighted ? 0.7 : 0.18),
+                    radius: highlighted ? (haloPulse ? 26 : 16) : 8,
+                    y: highlighted ? 0 : 4)
+            .shadow(color: Color.wgGood.opacity(highlighted ? (haloPulse ? 0.55 : 0.3) : 0),
+                    radius: highlighted ? (haloPulse ? 48 : 32) : 0)
+        }
+        #if os(tvOS)
+        .buttonStyle(NoChromeTVButtonStyle())
+        .focused($focused)
+        .focusEffectDisabled()
+        .animation(.spring(response: 0.32, dampingFraction: 0.78), value: focused)
+        .onChange(of: focused) { _, isFocused in
+            if isFocused {
+                withAnimation(.easeInOut(duration: 1.2).repeatForever(autoreverses: true)) {
+                    haloPulse = true
+                }
+            } else {
+                withAnimation(.easeOut(duration: 0.3)) {
+                    haloPulse = false
+                }
+            }
+        }
+        #else
+        .buttonStyle(.plain)
+        .onHover { hover = $0 }
+        .help("menu.language")
+        .animation(.spring(response: 0.32, dampingFraction: 0.78), value: hover)
+        #endif
+        .animation(.easeOut(duration: 0.15), value: session.languageCode)
     }
 }
 

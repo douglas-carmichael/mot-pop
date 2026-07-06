@@ -41,6 +41,22 @@ final class GameSession: ObservableObject {
     // UI overlays
     @Published var showHowToPlay: Bool = false
 
+    // Language
+
+    /// Active interface language ("en"/"fr"). Persisted as a manual override so
+    /// the choice survives relaunch and keeps localized JSON content in sync.
+    @Published var languageCode: String = LocalizedContent.languageCode {
+        didSet {
+            guard languageCode != oldValue else { return }
+            UserDefaults.standard.set(languageCode, forKey: LocalizedContent.overrideDefaultsKey)
+        }
+    }
+
+    /// Toggle between the two supported languages.
+    func toggleLanguage() {
+        languageCode = (languageCode == "fr") ? "en" : "fr"
+    }
+
     // MARK: - Driver
 
     private(set) var driver: SessionDriver?

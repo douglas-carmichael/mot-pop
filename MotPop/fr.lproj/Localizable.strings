@@ -12,6 +12,7 @@
 "menu.name.label" = "VOTRE NOM";
 "menu.name.placeholder" = "Entrez un nom";
 "menu.howToPlay" = "Comment jouer";
+"menu.language" = "Langue";
 
 /* Comment jouer */
 "howto.title" = "Comment jouer";

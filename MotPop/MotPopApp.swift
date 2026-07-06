@@ -17,6 +17,7 @@ struct MotPopApp: App {
         WindowGroup {
             RootView()
                 .environmentObject(session)
+                .environment(\.locale, Locale(identifier: session.languageCode))
                 #if os(macOS)
                 .frame(width: 1100, height: 840)
                 #endif

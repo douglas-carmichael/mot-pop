@@ -27,11 +27,27 @@ struct BotAnswerPool: Decodable {
 
 enum LocalizedContent {
 
-    /// Currently active language code, falling back to English.
-    static var languageCode: String {
+    /// Languages the app ships localized content for.
+    static let supportedLanguages = ["en", "fr"]
+
+    /// UserDefaults key holding a manual language override ("en"/"fr"), if any.
+    static let overrideDefaultsKey = "MotPopLanguageOverride"
+
+    /// The language derived from the system's preferred localizations.
+    static var systemLanguageCode: String {
         let preferred = Bundle.main.preferredLocalizations.first ?? "en"
         let base = preferred.split(separator: "-").first.map(String.init) ?? "en"
-        return ["fr", "en"].contains(base) ? base : "en"
+        return supportedLanguages.contains(base) ? base : "en"
+    }
+
+    /// Currently active language code — a manual override if set, otherwise the
+    /// system language, falling back to English.
+    static var languageCode: String {
+        if let override = UserDefaults.standard.string(forKey: overrideDefaultsKey),
+           supportedLanguages.contains(override) {
+            return override
+        }
+        return systemLanguageCode
     }
 
     static func presets() -> [String] {
