@@ -30,8 +30,8 @@ struct PrimaryButton: View {
     @State private var hovering = false
     #elseif os(tvOS)
     @FocusState private var focused: Bool
-    @State private var haloPulse = false
     #endif
+    @State private var haloPulse = false
 
     private var highlighted: Bool {
         #if os(macOS)
@@ -101,8 +101,8 @@ struct GhostButton: View {
     @State private var hovering = false
     #elseif os(tvOS)
     @FocusState private var focused: Bool
-    @State private var haloPulse = false
     #endif
+    @State private var haloPulse = false
 
     private var highlighted: Bool {
         #if os(macOS)
